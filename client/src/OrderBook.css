@@ -1,0 +1,7 @@
+.orderbook {
+    width: 300px;
+    height: 600px;
+    border: black 1px solid;
+    border-radius: 3px;
+    overflow-y: auto;
+}

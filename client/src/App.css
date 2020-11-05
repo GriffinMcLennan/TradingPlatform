@@ -1,0 +1,19 @@
+.app {
+  display: grid;
+  place-items: center;
+  height: 100vh;
+}
+
+.app__login {
+    display: flex;
+    flex-direction: column;
+}
+
+.app__login__buttons {
+    margin-top: 20px;
+}
+
+.app__userdata {
+    display: grid;
+    align-items: center;
+}

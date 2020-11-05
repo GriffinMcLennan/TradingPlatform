@@ -1,0 +1,11 @@
+.App {
+    text-align: center;
+    margin: 20px;
+}
+
+.orderbooks {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    margin: 50px;
+}

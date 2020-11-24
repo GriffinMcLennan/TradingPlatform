@@ -23,6 +23,8 @@ router.post("/", async (req, res, next) => {
             _id: new mongoose.Types.ObjectId(),
             username: username,
             password: hash,
+            balance: 10000,
+            shares: 100,
         });
 
         await user.save();

@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const MatchingEngine = require("./MatchingEngine/MatchingEngine");
 const Order = require("./MatchingEngine/Order");
+const User = require("./models/User");
 const app = express();
 const mongoose = require("mongoose");
 const http = require("http").createServer(app);
@@ -46,7 +47,7 @@ let connections = new Set();
 const ME = new MatchingEngine(io);
 
 //routes
-app.post("/", auth, (req, res) => {
+app.post("/", auth, async (req, res) => {
     const { orderType, amount, price } = req.body;
     const uuid = req._id;
 
@@ -62,6 +63,40 @@ app.post("/", auth, (req, res) => {
         return res.status(400).send("Invalid order parameters");
     }
 
+    try {
+        if (orderType === "buy") {
+            const matchingEngineAmount = ME.uuidBuyAmounts.has(uuid)
+                ? ME.uuidBuyAmounts.get(uuid)
+                : 0;
+
+            const data = await User.findOne({ _id: uuid });
+            const databaseAmount = data.balance;
+
+            console.log(databaseAmount - matchingEngineAmount, amount * price);
+
+            if (databaseAmount - matchingEngineAmount < amount * price) {
+                return res
+                    .status(400)
+                    .send("Insufficient funds for the order!");
+            }
+        } else {
+            const matchingEngineAmount = ME.uuidSellAmounts.has(uuid)
+                ? ME.uuidSellAmounts.get(uuid)
+                : 0;
+
+            const data = await User.findOne({ _id: uuid });
+            const databaseAmount = data.shares;
+
+            if (databaseAmount - matchingEngineAmount < amount) {
+                return res
+                    .status(400)
+                    .send("Insufficient funds for the order!");
+            }
+        }
+    } catch (e) {
+        console.log(e.message);
+    }
+
     console.time("time");
     const order = new Order(uuid, orderType, amount, price);
     ME.processOrder(order);
@@ -72,7 +107,8 @@ app.post("/", auth, (req, res) => {
 io.on("connection", (socket) => {
     console.log("A client connected to the websocket!");
     connections.add(socket);
-    socket.emit("FromAPI", ME.generatePublicOrderBook());
+    socket.emit("OrderBooksUpdate", ME.generatePublicOrderBook());
+    ME.commitTransactions([]);
 
     socket.on("disconnect", () => {
         console.log("A client disconnected from the websocket!");

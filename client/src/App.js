@@ -57,16 +57,19 @@ function App() {
                 { withCredentials: true }
             );
 
-            console.log(result);
+            // console.log(result);
+            const uuid = result.data.uuid;
+            const balance = result.data.balance;
+            setUserData([uuid, balance]);
 
-            const secretResult = await axios.post(
-                "http://localhost:5000/secret",
-                {},
-                { withCredentials: true }
-            );
-            const secretData = secretResult.data;
+            // const secretResult = await axios.post(
+            //     "http://localhost:5000/secret",
+            //     {},
+            //     { withCredentials: true }
+            // );
+            // const secretData = secretResult.data;
 
-            setUserData(secretData.uuid);
+            // setUserData(secretData.uuid);
             setLoggedIn(true);
             setErrorMsg(null);
         } catch (err) {
@@ -91,7 +94,8 @@ function App() {
             );
 
             const uuid = result.data.uuid;
-            setUserData(uuid);
+            const balance = result.data.balance;
+            setUserData([uuid, balance]);
             setLoggedIn(true);
         } catch (err) {
             setErrorMsg(err.response.data);

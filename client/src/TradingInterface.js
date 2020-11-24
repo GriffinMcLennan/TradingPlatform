@@ -10,7 +10,6 @@ const ENDPOINT = "http://localhost:5000";
 function TradingInterface({ logout }) {
     const [price, setPrice] = useState(0);
     const [amount, setAmount] = useState(0);
-    const [uid, setUid] = useState(0);
     const [buyBook, setBuyBook] = useState([]);
     const [sellBook, setSellBook] = useState([]);
     const [lastPrice, setLastPrice] = useState(0);
@@ -36,7 +35,6 @@ function TradingInterface({ logout }) {
             const response = await axios.post(
                 "http://localhost:5000",
                 {
-                    uuid: parseInt(uid),
                     orderType: orderType,
                     price: parseInt(price),
                     amount: parseInt(amount),
@@ -44,18 +42,16 @@ function TradingInterface({ logout }) {
                 { withCredentials: true }
             );
         } catch (err) {
-            console.log(err.message);
-            logout();
+            // console.log(err.response);
+            if (err.response.data !== "Insufficient funds for the order!") {
+                logout();
+            }
         }
     };
 
     return (
         <div className="tradinginterface">
             <div className="order">
-                <input
-                    placeholder="uid"
-                    onChange={(e) => setUid(e.target.value)}
-                />
                 <input
                     placeholder="price"
                     onChange={(e) => setPrice(e.target.value)}

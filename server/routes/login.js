@@ -18,6 +18,7 @@ router.post("/", async (req, res) => {
 
     try {
         const user = await User.findOne({ username: username });
+        console.log(user);
 
         if (!user) {
             return res.status(401).send("Error: User not found");
@@ -50,9 +51,12 @@ router.post("/", async (req, res) => {
         });
         res.cookie("isLoggedIn", true);
 
-        return res
-            .status(200)
-            .send({ msg: "Successfully logged in", uuid: user._id });
+        return res.status(200).send({
+            msg: "Successfully logged in",
+            uuid: user._id,
+            balance: user.balance,
+            shares: user.shares,
+        });
     } catch (err) {
         console.log("Error:", err.message);
         return res.status(400).send();

@@ -12,6 +12,7 @@ class MatchingEngine {
         this.socketIO = io;
         this.uuidBuyAmounts = new Map();
         this.uuidSellAmounts = new Map();
+        this.lastPrice = 0;
     }
 
     processOrder(order) {
@@ -192,13 +193,14 @@ class MatchingEngine {
 
     commitTransactions(transactions) {
         if (transactions.length === 0) {
+            this.socketIO.emit("LastPriceUpdate", this.lastPrice);
             return;
         }
 
         const n = transactions.length;
-        const lastPrice = transactions[n - 1].transactionPrice;
+        this.lastPrice = transactions[n - 1].transactionPrice;
 
-        this.socketIO.emit("LastPriceUpdate", lastPrice);
+        this.socketIO.emit("LastPriceUpdate", this.lastPrice);
 
         //connect to database here
         /* 
